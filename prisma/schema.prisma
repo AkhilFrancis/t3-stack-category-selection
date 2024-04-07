@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  isVerified    Boolean         @default(false)
+  otp           String          @default("123456")
+  userCategories UserCategory[]
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?       
+}
+
+model Category {
+  id            String          @id @default(uuid())
+  name          String
+  userCategories UserCategory[]
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?       
+}
+
+model UserCategory {
+  id            String          @id @default(uuid())
+  userId        String
+  categoryId    String
+  user          User            @relation(fields: [userId], references: [id])
+  category      Category        @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?       
+  @@unique([userId, categoryId])
+}
